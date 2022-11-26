@@ -3,7 +3,7 @@ A header-only "micro library" containing useful basic functions for vector and m
 
 Functions starting with "vector" can only be applied to a vector, and functions starting with "matrix" can only be applied to a matrix. 
 
-The library is designed for maximum flexibility, prioritising no compile errors over safety. For example, you can do a dot product between two vectors of different sizes. The result will obviously be wrong, but you won't get errors or warnings.
+The library is designed for maximum flexibility, prioritising no compile errors over maths riggor. For example, you can do a dot product between two vectors of different sizes. The result will obviously be wrong, but you won't get errors or warnings.
 
 Notes: 
 - Strongly recommended: "using namespace arrmath" at the top of your file.
