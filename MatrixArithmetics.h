@@ -24,6 +24,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 namespace arrmath {
 
@@ -125,7 +126,7 @@ namespace arrmath {
             }
         }
         if (vposSum == 0 || vnegSum == 0) {
-            return arrayOfZeros<T>(vec.size());
+            return vectorOfZeros<T>(vec.size());
         }
         else if (vposSum > vnegSum) {
             for (size_t i = 0; i < vec.size(); i++) {
@@ -188,7 +189,7 @@ namespace arrmath {
     // [1, 2, 3] (1 row, 3 columns) => [[1], [2], [3]] (3 rows, 1 column).
     template<typename T>
     matrix<T> vectorTranspose(vector<T> vec) {
-        matrix<T> result = arrayOfZeros<T>(vec.size(), 1);
+        matrix<T> result = matrixOfZeros<T>(vec.size(), 1);
         for (size_t i = 0; i < vec.size(); i++) {
             result[i][0] = vec[i];
         }
@@ -225,7 +226,7 @@ namespace arrmath {
         for (size_t i = 0; i < vec1.size(); i++) {
             vec1[i] += vec2[i];
         }
-        return arrayScale<T>(vec1, static_cast<T>(0.5));
+        return vectorScale<T>(vec1, static_cast<T>(0.5));
     }
 
     // Compute the average of multiple vectors stored in a matrix.
@@ -235,13 +236,13 @@ namespace arrmath {
     vector<T> vectorAverage(matrix<T> mtx) {
         size_t numOfVectors = mtx.size();
         size_t lengthOfVectors = mtx[0].size();
-        vector<T> result = arrayOfZeros<T>(lengthOfVectors);
+        vector<T> result = vectorOfZeros<T>(lengthOfVectors);
         for (size_t i = 0; i < numOfVectors; i++) {
             for (size_t j = 0; j < lengthOfVectors; j++) {
                 result[j] += mtx[i][j];
             }
         }
-        return arrayScale<T>(result, static_cast<T>(1.0) / static_cast<T>(numOfVectors));
+        return vectorScale<T>(result, static_cast<T>(1.0) / static_cast<T>(numOfVectors));
     }
 
     // Compute the distance between two vectors. Use the coordinateSystem argument to specify
@@ -250,12 +251,12 @@ namespace arrmath {
     template<typename T>
     T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = cart) {
         size_t length = std::min(vec1.size(), vec2.size());
-        if (coordinateSystem == pol) {
+        if (coordinateSystem == CoordSystem::pol) {
             vec1 = polToCart<T>(vec1);
             vec2 = polToCart<T>(vec2);
             length = 2;
         }
-        else if (coordinateSystem == sph) {
+        else if (coordinateSystem == CoordSystem::sph) {
             vec1 = sphToCart<T>(vec1);
             vec2 = sphToCart<T>(vec2);
             length = 3;
@@ -266,6 +267,16 @@ namespace arrmath {
         }
         return sqrt(sum);
     }
+
+    // apply arbitrary function to all values in a vector
+    template<typename T>
+    vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func) {
+        for (size_t i = 0; i < vec.size(); i++) {
+            vec[i] = func(vec[i]);
+        }
+        return vec;
+    }
+
 
     //=================//
     //  MATRIX MATHS   //
@@ -367,9 +378,9 @@ namespace arrmath {
             std::cout << "matrixMultiply | Warning : dimensions not fit for matrix multiplication. Returning first argument." << std::endl;
             return mtx1;
         }
-        matrix<T> result = arrayOfZeros<T>(nRows1, nCols2);
+        matrix<T> result = matrixOfZeros<T>(nRows1, nCols2);
 
-        matrix<T> mtxT = arrayTranspose<T>(mtx2);
+        matrix<T> mtxT = matrixTranspose<T>(mtx2);
 
         for (size_t i = 0; i < nRows1; i++) {
             for (size_t j = 0; j < nCols2; j++) {
@@ -385,7 +396,7 @@ namespace arrmath {
     matrix<T> matrixTranspose(matrix<T> mtx) {
         size_t nCols = mtx.size();
         size_t nRows = mtx[0].size();
-        matrix<T> result = arrayOfZeros<T>(nRows, nCols);
+        matrix<T> result = matrixOfZeros<T>(nRows, nCols);
         for (size_t i = 0; i < nRows; i++) {
             for (size_t j = 0; j < nCols; j++) {
                 result[i][j] = mtx[j][i];
@@ -394,11 +405,22 @@ namespace arrmath {
         return result;
     }
 
+    // apply arbitrary function to all values in a matrix
+    template<typename T>
+    matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func) {
+        for (size_t i = 0; i < mtx.size(); i++) {
+            for (size_t j = 0; j < mtx[i].size(); j++) {
+                mtx[i][j] = func(mtx[i][j]);
+            }
+        }
+        return mtx;
+    }
+
     //==========================================//
     //  CONVERSION BETWEEN COORDINATE SYSTEMS   //
     //==========================================//
     
-    enum CoordSystem {
+    enum class CoordSystem {
         cart = 0,
         pol = 1,
         sph = 2
@@ -407,7 +429,7 @@ namespace arrmath {
     // Convert polar coordinates to a cartesian vector
     template<typename T>
     vector<T> polToCart(T theta, T radius) {
-        vector<T> result = arrayOfZeros<T>(2);
+        vector<T> result = vectorOfZeros<T>(2);
         result[0] = radius * cos(theta);
         result[1] = radius * sin(theta);
         return result;
@@ -416,7 +438,7 @@ namespace arrmath {
     // Convert polar vector to cartesian vector
     template<typename T>
     vector<T> polToCart(vector<T> vec) {
-        vector<T> result = arrayOfZeros<T>(2);
+        vector<T> result = vectorOfZeros<T>(2);
         result[0] = vec[1] * cos(vec[0]);
         result[1] = vec[1] * sin(vec[0]);
         return result;
@@ -426,13 +448,13 @@ namespace arrmath {
     // in a matrix.
     template<typename T>
     matrix<T> polToCart(vector<T> theta, vector<T> radius, bool transpose = false) {
-        matrix<T> result = arrayOfZeros<T>(theta.size(), 2);
+        matrix<T> result = matrixOfZeros<T>(theta.size(), 2);
         for (size_t i = 0; i < theta.size(); i++) {
             result[i][0] = radius[i] * cos(theta[i]);
             result[i][1] = radius[i] * sin(theta[i]);
         }
         if (transpose) {
-            result = arrayTranspose(result);
+            result = matrixTranspose(result);
         }
         return result;
     }
@@ -441,13 +463,13 @@ namespace arrmath {
     // in a matrix.
     template<typename T>
     matrix<T> polToCart(matrix<T> mtx, bool transpose = false) {
-        matrix<T> result = arrayOfZeros<T>(mtx.size(), 2);
+        matrix<T> result = matrixOfZeros<T>(mtx.size(), 2);
         for (size_t i = 0; i < mtx.size(); i++) {
             result[i][0] = mtx[1][i] * cos(mtx[0][i]);
             result[i][1] = mtx[1][i] * sin(mtx[0][i]);
         }
         if (transpose) {
-            result = arrayTranspose(result);
+            result = matrixTranspose(result);
         }
         return result;
     }
@@ -455,7 +477,7 @@ namespace arrmath {
     // convert spherical coordinates to a cartesian vector
     template<typename T>
     vector<T> sphToCart(T theta, T phi, T radius) {
-        vector<T> result = arrayOfZeros<T>(3);
+        vector<T> result = vectorOfZeros<T>(3);
         T rCosElev = radius * cos(phi);
         result[0] = rCosElev * cos(theta);
         result[1] = rCosElev * sin(theta);
@@ -466,7 +488,7 @@ namespace arrmath {
     // convert spherical vector to cartesian vector
     template<typename T>
     vector<T> sphToCart(vector<T> vec) {
-        vector<T> result = arrayOfZeros<T>(3);
+        vector<T> result = vectorOfZeros<T>(3);
         T rCosElev = vec[2] * cos(vec[1]);
         result[0] = rCosElev * cos(vec[0]);
         result[1] = rCosElev * sin(vec[0]);
@@ -478,7 +500,7 @@ namespace arrmath {
     // in a matrix.
     template<typename T>
     matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose = false) {
-        matrix<T> result = arrayOfZeros<T>(theta.size(), 3);
+        matrix<T> result = matrixOfZeros<T>(theta.size(), 3);
         for (size_t i = 0; i < theta.size(); i++) {
             T rCosElev = radius[i] * cos(phi[i]);
             result[i][0] = rCosElev * cos(theta[i]);
@@ -486,7 +508,7 @@ namespace arrmath {
             result[i][2] = radius[i] * sin(phi[i]);
         }
         if (transpose) {
-            result = arrayTranspose(result);
+            result = matrixTranspose(result);
         }
         return result;
     }
@@ -495,7 +517,7 @@ namespace arrmath {
     // in a matrix.
     template<typename T>
     matrix<T> sphToCart(matrix<T> mtx, bool transpose = false) {
-        matrix<T> result = arrayOfZeros<T>(mtx.size(), 3);
+        matrix<T> result = matrixOfZeros<T>(mtx.size(), 3);
         for (size_t i = 0; i < mtx.size(); i++) {
             T rCosElev = mtx[i][2] * cos(mtx[i][1]);
             result[i][0] = rCosElev * cos(mtx[i][0]);
@@ -503,7 +525,7 @@ namespace arrmath {
             result[i][2] = mtx[i][2] * sin(mtx[i][1]);
         }
         if (transpose) {
-            result = arrayTranspose(result);
+            result = matrixTranspose(result);
         }
         return result;
     }

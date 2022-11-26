@@ -28,6 +28,7 @@ Notes:
 - vectorMagnitude : compute Euclidean norm (magnitude)
 - vectorAverage : compute average of two or more points in space
 - vectorGetDistance : compute distance between two points in space
+- vectorFunc : apply arbitrary lambda function to all elements in a vector
 
 ### Matrix Maths:
 - matrixOfZeros : create a matrix of zeros
@@ -38,6 +39,7 @@ Notes:
 - matrixScale : scale by a constant
 - matrixMultiply : multiply two matrices following standard matrix-multiplication rules
 - matrixTranspose : tranpose matrix
+- matrixFunc : apply arbitrary lambda function to all elements in a matrix
 
 ### Coordinate System Conversion:
 - polToCart : convert polar coordinates to cartesian
