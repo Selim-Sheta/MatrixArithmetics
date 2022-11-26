@@ -220,6 +220,14 @@ namespace arrmath {
         return sqrt(result);
     }
 
+    // Divide all the values in the vector by its magnitude
+    template<typename T>
+    vector<T> vectorNormalise(vector<T> vec) {
+        T mag = vectorMagnitude<T>(vec);
+        if (mag != static_cast<T>(0.0)) return vectorScale<T>(vec, static_cast<T>(1.0) / mag);
+        else return vec;
+    }
+
     // Compute the average of two vectors
     template<typename T>
     vector<T> vectorAverage(vector<T> vec1, vector<T> vec2) {
