@@ -20,7 +20,6 @@
 */
 
 #pragma once
-#include <array>
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -28,13 +27,166 @@
 
 namespace arrmath {
 
-    const bool DISABLE_WARNINGS = true;
+    static const bool DISABLE_WARNINGS = true;
 
     template<typename T>
     using matrix = std::vector<std::vector<T>>;
 
     template<typename T>
     using vector = std::vector<T>;
+
+    enum class CoordSystem { cart = 0, pol = 1, sph = 2 };
+
+    // create vector of zeros
+    template<typename T>
+    vector<T> vectorOfZeros(size_t size);
+
+    // get the maximum value in a vector
+    template<typename T>
+    T vectorMax(vector<T> vec);
+
+    // get the minimum value in a vector
+    template<typename T>
+    T vectorMin(vector<T> vec);
+
+    // get the difference between the largest and smallest value in a vector
+    template<typename T>
+    T vectorSpan(vector<T> vec);
+
+    // get Index of largest element in a vector
+    template<typename T>
+    size_t vectorMaxIndex(vector<T> vec);
+
+    // get Index of smallest element in a vector
+    template<typename T>
+    size_t vectorMinIndex(vector<T> vec);
+
+    // Apply zero-averaging to a vector
+    // This scales the positive and/or negative elements in a vector
+    // So that the average of all values is zero.
+    template<typename T>
+    vector<T> vectorZeroAvg(vector<T> vec);
+
+    // Element-wise mutliplication of two vectors
+    template<typename T>
+    vector<T> vectorElemMult(vector<T> vec1, vector<T> vec2);
+
+    // Element-wise addition of two vectors
+    template<typename T>
+    vector<T> vectorElemAdd(vector<T> vec1, vector<T> vec2);
+
+    // Multiply vector by scalar
+    template<typename T>
+    vector<T> vectorScale(vector<T> vec, T scalar);
+
+    // Transpose a vector
+    // Note - This will result in a "column vector":
+    // [1, 2, 3] (1 row, 3 columns) => [[1], [2], [3]] (3 rows, 1 column).
+    template<typename T>
+    matrix<T> vectorTranspose(vector<T> vec);
+
+    // Compute the dot product of two vectors
+    template<typename T>
+    T vectorDotProduct(vector<T> vec1, vector<T> vec2);
+
+    // Compute the magnitude (Euclidean norm) of a vector
+    template<typename T>
+    T vectorMagnitude(vector<T> vec);
+
+    // Divide all the values in the vector by its magnitude
+    template<typename T>
+    vector<T> vectorNormalise(vector<T> vec);
+
+    // Compute the average of two vectors
+    template<typename T>
+    vector<T> vectorAverage(vector<T> vec1, vector<T> vec2);
+
+    // Compute the average of multiple vectors stored in a matrix.
+    // All vectors must be of the same length. The vectors must be
+    // rows in the matrix.
+    template<typename T>
+    vector<T> vectorAverage(matrix<T> mtx);
+
+    // Compute the distance between two vectors. Use the coordinateSystem argument to specify
+    // if the input vectors are cartesian (cart), polar (pol), or spherical (sph). 
+    // By default it's assumed that both vectors are cartesian. 
+    template<typename T>
+    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = cart);
+
+    // apply arbitrary function to all values in a vector
+    template<typename T>
+    vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func);
+
+    // create matrix of zeros
+    template<typename T>
+    matrix<T> matrixOfZeros(size_t rows, size_t cols);
+
+    // get the maximum value in a matrix
+    template<typename T>
+    T matrixMax(matrix<T> mtx);
+
+    // get the minimum value in a matrix
+    template<typename T>
+    T matrixMin(matrix<T> mtx);
+
+    // Element-wise mutliplication of two matrices
+    template<typename T>
+    matrix<T> matrixElemMult(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Element-wise addition of two matrices
+    template<typename T>
+    matrix<T> matrixElemAdd(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Multiply matrix by scalar
+    template<typename T>
+    matrix<T> matrixScale(matrix<T> mtx, T scalar);
+
+    // Multiply two matrices using regular matrix multiplication rules
+    template<typename T>
+    matrix<T> matrixMultiply(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Transpose a matrix
+    template<typename T>
+    matrix<T> matrixTranspose(matrix<T> mtx);
+
+    // apply arbitrary function to all values in a matrix
+    template<typename T>
+    matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func);
+
+    // Convert polar coordinates to a cartesian vector
+    template<typename T>
+    vector<T> polToCart(T theta, T radius);
+
+    // Convert polar vector to cartesian vector
+    template<typename T>
+    vector<T> polToCart(vector<T> vec);
+    // Convert polar coordinates stored in separate vectors to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> polToCart(vector<T> theta, vector<T> radius, bool transpose = false);
+
+    // Convert polar vectors stored in a matrix to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> polToCart(matrix<T> mtx, bool transpose = false);
+
+    // convert spherical coordinates to a cartesian vector
+    template<typename T>
+    vector<T> sphToCart(T theta, T phi, T radius);
+
+    // convert spherical vector to cartesian vector
+    template<typename T>
+    vector<T> sphToCart(vector<T> vec);
+
+    // Convert spherical coordinates stored in separate vectors to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose = false);
+
+    // Convert spherical vectors stored in a matrix to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> sphToCart(matrix<T> mtx, bool transpose = false);
 
     //=================//
     //  VECTOR MATHS   //
@@ -215,7 +367,7 @@ namespace arrmath {
     T vectorMagnitude(vector<T> vec) {
         T result = static_cast<T>(0.0);
         for (size_t i = 0; i < vec.size(); i++) {
-            sum += vec[i] * vec[i];
+            result += vec[i] * vec[i];
         }
         return sqrt(result);
     }
@@ -257,7 +409,7 @@ namespace arrmath {
     // if the input vectors are cartesian (cart), polar (pol), or spherical (sph). 
     // By default it's assumed that both vectors are cartesian. 
     template<typename T>
-    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = cart) {
+    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem) {
         size_t length = std::min(vec1.size(), vec2.size());
         if (coordinateSystem == CoordSystem::pol) {
             vec1 = polToCart<T>(vec1);
@@ -292,7 +444,8 @@ namespace arrmath {
  
     // create matrix of zeros
     template<typename T>
-    matrix<T> matrixOfZeros(size_t rows, size_t cols) {
+    matrix<T> matrixOfZeros(size_t rows, size_t cols)
+    {
         matrix<T> newMatrix;
         for (size_t i = 0; i < rows; i++) {
             newMatrix.push_back(vector<T>(cols, static_cast<T>(0.0)));
@@ -428,11 +581,7 @@ namespace arrmath {
     //  CONVERSION BETWEEN COORDINATE SYSTEMS   //
     //==========================================//
     
-    enum class CoordSystem {
-        cart = 0,
-        pol = 1,
-        sph = 2
-    };
+    
 
     // Convert polar coordinates to a cartesian vector
     template<typename T>
@@ -455,14 +604,14 @@ namespace arrmath {
     // Convert polar coordinates stored in separate vectors to cartesian vectors stored
     // in a matrix.
     template<typename T>
-    matrix<T> polToCart(vector<T> theta, vector<T> radius, bool transpose = false) {
+    matrix<T> polToCart(vector<T> theta, vector<T> radius, bool transpose) {
         matrix<T> result = matrixOfZeros<T>(theta.size(), 2);
         for (size_t i = 0; i < theta.size(); i++) {
             result[i][0] = radius[i] * cos(theta[i]);
             result[i][1] = radius[i] * sin(theta[i]);
         }
         if (transpose) {
-            result = matrixTranspose(result);
+            result = matrixTranspose<T>(result);
         }
         return result;
     }
@@ -470,14 +619,14 @@ namespace arrmath {
     // Convert polar vectors stored in a matrix to cartesian vectors stored
     // in a matrix.
     template<typename T>
-    matrix<T> polToCart(matrix<T> mtx, bool transpose = false) {
+    matrix<T> polToCart(matrix<T> mtx, bool transpose) {
         matrix<T> result = matrixOfZeros<T>(mtx.size(), 2);
         for (size_t i = 0; i < mtx.size(); i++) {
             result[i][0] = mtx[1][i] * cos(mtx[0][i]);
             result[i][1] = mtx[1][i] * sin(mtx[0][i]);
         }
         if (transpose) {
-            result = matrixTranspose(result);
+            result = matrixTranspose<T>(result);
         }
         return result;
     }
@@ -507,7 +656,7 @@ namespace arrmath {
     // Convert spherical coordinates stored in separate vectors to cartesian vectors stored
     // in a matrix.
     template<typename T>
-    matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose = false) {
+    matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose) {
         matrix<T> result = matrixOfZeros<T>(theta.size(), 3);
         for (size_t i = 0; i < theta.size(); i++) {
             T rCosElev = radius[i] * cos(phi[i]);
@@ -516,7 +665,7 @@ namespace arrmath {
             result[i][2] = radius[i] * sin(phi[i]);
         }
         if (transpose) {
-            result = matrixTranspose(result);
+            result = matrixTranspose<T>(result);
         }
         return result;
     }
@@ -524,7 +673,7 @@ namespace arrmath {
     // Convert spherical vectors stored in a matrix to cartesian vectors stored
     // in a matrix.
     template<typename T>
-    matrix<T> sphToCart(matrix<T> mtx, bool transpose = false) {
+    matrix<T> sphToCart(matrix<T> mtx, bool transpose) {
         matrix<T> result = matrixOfZeros<T>(mtx.size(), 3);
         for (size_t i = 0; i < mtx.size(); i++) {
             T rCosElev = mtx[i][2] * cos(mtx[i][1]);
@@ -533,7 +682,7 @@ namespace arrmath {
             result[i][2] = mtx[i][2] * sin(mtx[i][1]);
         }
         if (transpose) {
-            result = matrixTranspose(result);
+            result = matrixTranspose<T>(result);
         }
         return result;
     }
