@@ -36,6 +36,158 @@ namespace arrmath {
     using vector = std::vector<T>;
 
     enum class CoordSystem { cart = 0, pol = 1, sph = 2 };
+
+    // create vector of zeros
+    template<typename T>
+    vector<T> vectorOfZeros(size_t size);
+
+    // get the maximum value in a vector
+    template<typename T>
+    T vectorMax(vector<T> vec);
+
+    // get the minimum value in a vector
+    template<typename T>
+    T vectorMin(vector<T> vec);
+
+    // get the difference between the largest and smallest value in a vector
+    template<typename T>
+    T vectorSpan(vector<T> vec);
+
+    // get Index of largest element in a vector
+    template<typename T>
+    size_t vectorMaxIndex(vector<T> vec);
+
+    // get Index of smallest element in a vector
+    template<typename T>
+    size_t vectorMinIndex(vector<T> vec);
+
+    // Apply zero-averaging to a vector
+    // This scales the positive and/or negative elements in a vector
+    // So that the average of all values is zero.
+    template<typename T>
+    vector<T> vectorZeroAvg(vector<T> vec);
+
+    // Element-wise mutliplication of two vectors
+    template<typename T>
+    vector<T> vectorElemMult(vector<T> vec1, vector<T> vec2);
+
+    // Element-wise addition of two vectors
+    template<typename T>
+    vector<T> vectorElemAdd(vector<T> vec1, vector<T> vec2);
+
+    // Multiply vector by scalar
+    template<typename T>
+    vector<T> vectorScale(vector<T> vec, T scalar);
+
+    // Transpose a vector
+    // Note - This will result in a "column vector":
+    // [1, 2, 3] (1 row, 3 columns) => [[1], [2], [3]] (3 rows, 1 column).
+    template<typename T>
+    matrix<T> vectorTranspose(vector<T> vec);
+
+    // Compute the dot product of two vectors
+    template<typename T>
+    T vectorDotProduct(vector<T> vec1, vector<T> vec2);
+
+    // Compute the magnitude (Euclidean norm) of a vector
+    template<typename T>
+    T vectorMagnitude(vector<T> vec);
+
+    // Divide all the values in the vector by its magnitude
+    template<typename T>
+    vector<T> vectorNormalise(vector<T> vec);
+
+    // Compute the average of two vectors
+    template<typename T>
+    vector<T> vectorAverage(vector<T> vec1, vector<T> vec2);
+
+    // Compute the average of multiple vectors stored in a matrix.
+    // All vectors must be of the same length. The vectors must be
+    // rows in the matrix.
+    template<typename T>
+    vector<T> vectorAverage(matrix<T> mtx);
+
+    // Compute the distance between two vectors. Use the coordinateSystem argument to specify
+    // if the input vectors are cartesian (cart), polar (pol), or spherical (sph). 
+    // By default it's assumed that both vectors are cartesian. 
+    template<typename T>
+    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = cart);
+
+    // apply arbitrary function to all values in a vector
+    template<typename T>
+    vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func);
+
+    // create matrix of zeros
+    template<typename T>
+    matrix<T> matrixOfZeros(size_t rows, size_t cols);
+
+    // get the maximum value in a matrix
+    template<typename T>
+    T matrixMax(matrix<T> mtx);
+
+    // get the minimum value in a matrix
+    template<typename T>
+    T matrixMin(matrix<T> mtx);
+
+    // Element-wise mutliplication of two matrices
+    template<typename T>
+    matrix<T> matrixElemMult(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Element-wise addition of two matrices
+    template<typename T>
+    matrix<T> matrixElemAdd(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Multiply matrix by scalar
+    template<typename T>
+    matrix<T> matrixScale(matrix<T> mtx, T scalar);
+
+    // Multiply two matrices using regular matrix multiplication rules
+    template<typename T>
+    matrix<T> matrixMultiply(matrix<T> mtx1, matrix<T> mtx2);
+
+    // Transpose a matrix
+    template<typename T>
+    matrix<T> matrixTranspose(matrix<T> mtx);
+
+    // apply arbitrary function to all values in a matrix
+    template<typename T>
+    matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func);
+
+    // Convert polar coordinates to a cartesian vector
+    template<typename T>
+    vector<T> polToCart(T theta, T radius);
+
+    // Convert polar vector to cartesian vector
+    template<typename T>
+    vector<T> polToCart(vector<T> vec);
+    // Convert polar coordinates stored in separate vectors to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> polToCart(vector<T> theta, vector<T> radius, bool transpose = false);
+
+    // Convert polar vectors stored in a matrix to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> polToCart(matrix<T> mtx, bool transpose = false);
+
+    // convert spherical coordinates to a cartesian vector
+    template<typename T>
+    vector<T> sphToCart(T theta, T phi, T radius);
+
+    // convert spherical vector to cartesian vector
+    template<typename T>
+    vector<T> sphToCart(vector<T> vec);
+
+    // Convert spherical coordinates stored in separate vectors to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose = false);
+
+    // Convert spherical vectors stored in a matrix to cartesian vectors stored
+    // in a matrix.
+    template<typename T>
+    matrix<T> sphToCart(matrix<T> mtx, bool transpose = false);
+
     //=================//
     //  VECTOR MATHS   //
     //=================//
