@@ -153,6 +153,10 @@ namespace arrmath {
     template<typename T>
     matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func);
 
+    // Substract the smallest value in a matrix from all its element
+    template<typename T>
+    matrix<T> matrixShiftToZero(matrix<T> mtx);
+
     // Convert polar coordinates to a cartesian vector
     template<typename T>
     vector<T> polToCart(T theta, T radius);
@@ -572,6 +576,20 @@ namespace arrmath {
         for (size_t i = 0; i < mtx.size(); i++) {
             for (size_t j = 0; j < mtx[i].size(); j++) {
                 mtx[i][j] = func(mtx[i][j]);
+            }
+        }
+        return mtx;
+    }
+
+    // Substract the smallest value in a matrix from all its element
+    template<typename T>
+    matrix<T> matrixShiftToZero(matrix<T> mtx) {
+        T correction = matrixMin<T>(mtx);
+        if (correction != static_cast<T>(0.0)){
+            for (size_t i = 0; i < mtx.size(); i++) {
+                for (size_t j = 0; j < mtx[i].size(); j++) {
+                    mtx[i][j] -= correction;
+                }
             }
         }
         return mtx;
