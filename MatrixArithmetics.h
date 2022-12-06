@@ -157,6 +157,10 @@ namespace arrmath {
     template<typename T>
     matrix<T> matrixShiftToZero(matrix<T> mtx);
 
+    // Flatten and sort a matrix, output the indices in order.
+    template<typename T>
+    matrix<size_t> matrixSortIndices(matrix<T> mtx);
+
     // Convert polar coordinates to a cartesian vector
     template<typename T>
     vector<T> polToCart(T theta, T radius);
@@ -191,6 +195,66 @@ namespace arrmath {
     // in a matrix.
     template<typename T>
     matrix<T> sphToCart(matrix<T> mtx, bool transpose = false);
+
+    //////////// QUICKSORT UTILITIES ///////////
+    
+    // index pair for matrix sorting
+    using mtxIndex = std::array<size_t, 2>;
+
+    template<typename T>
+    int partition(vector<T> &arr, vector<mtxIndex> &idx, size_t start, size_t end)
+    {
+        T pivot = arr[start];
+ 
+        size_t count = 0;
+        for (size_t i = start + 1; i <= end; i++) {
+            if (arr[i] <= pivot) count++;
+        }
+ 
+        // Giving pivot element its correct position
+        size_t pivotIndex = start + count;
+        swap(arr[pivotIndex], arr[start]);
+        swap(idx[pivotIndex], idx[start]);
+ 
+        // Sorting left and right parts of the pivot element
+        size_t i = start;
+        size_t j = end;
+ 
+        while (i < pivotIndex && j > pivotIndex) {
+ 
+            while (arr[i] <= pivot) {
+                i++;
+            }
+ 
+            while (arr[j] > pivot) {
+                j--;
+            }
+ 
+            if (i < pivotIndex && j > pivotIndex) {
+                swap(arr[i++], arr[j--]);
+                swap(idx[i++], idx[j--]);
+            }
+        }
+ 
+        return pivotIndex;
+    }
+    
+    template<typename T>
+    void quickSort(vector<T> &arr, vector<mtxIndex> &idx, int start, int end)
+    {
+        // base case
+        if (start >= end)
+            return;
+ 
+        // partitioning the array
+        int p = partition(arr, idx, start, end);
+ 
+        // Sorting the left part
+        quickSort(arr, idx, start, p - 1);
+ 
+        // Sorting the right part
+        quickSort(arr, idx, p + 1, end);
+    }
 
     //=================//
     //  VECTOR MATHS   //
@@ -593,6 +657,22 @@ namespace arrmath {
             }
         }
         return mtx;
+    }
+
+    // Flatten and sort a matrix, output the indices in order.
+    template<typename T>
+    vector<mtxIndex> matrixSortIndices(matrix<T> mtx){
+        size_t length = mtx.size() * mtx[0].size();
+        vector<T> vec;
+        vector<mtxIndex> idx;
+        for (size_t i{}; i < mtx.size(); i++){
+            for (size_t j{}; j < mtx[i].size(); j++) {
+                vec.push_back(mtx[i][j]);
+                idx.push_back({ i, j });
+            }
+        }
+        quickSort(vec, idx, 0, length - 1);
+        return idx;
     }
 
     //==========================================//
