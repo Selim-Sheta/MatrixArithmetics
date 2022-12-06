@@ -35,6 +35,12 @@ namespace arrmath {
     template<typename T>
     using vector = std::vector<T>;
 
+    // index pair for matrix sorting
+    using mtxIndex = std::pair<size_t, size_t>;
+
+    template<typename T>
+    using valIdx = std::pair<T,std::pair<size_t, size_t>>;
+
     enum class CoordSystem { cart = 0, pol = 1, sph = 2 };
 
     // create vector of zeros
@@ -159,7 +165,7 @@ namespace arrmath {
 
     // Flatten and sort a matrix, output the indices in order.
     template<typename T>
-    matrix<size_t> matrixSortIndices(matrix<T> mtx);
+    vector<mtxIndex> matrixSortIndices(matrix<T> mtx);
 
     // Convert polar coordinates to a cartesian vector
     template<typename T>
@@ -197,24 +203,20 @@ namespace arrmath {
     matrix<T> sphToCart(matrix<T> mtx, bool transpose = false);
 
     //////////// QUICKSORT UTILITIES ///////////
-    
-    // index pair for matrix sorting
-    using mtxIndex = std::array<size_t, 2>;
 
     template<typename T>
-    int partition(vector<T> &arr, vector<mtxIndex> &idx, size_t start, size_t end)
+    int partition(vector<valIdx<T>> &arr, int start, int end)
     {
-        T pivot = arr[start];
+        T pivot = arr[start].first;
  
-        size_t count = 0;
+        int count = 0;
         for (size_t i = start + 1; i <= end; i++) {
-            if (arr[i] <= pivot) count++;
+            if (arr[i].first <= pivot) count++;
         }
  
         // Giving pivot element its correct position
-        size_t pivotIndex = start + count;
-        swap(arr[pivotIndex], arr[start]);
-        swap(idx[pivotIndex], idx[start]);
+        int pivotIndex = start + count;
+        std::swap(arr[pivotIndex], arr[start]);
  
         // Sorting left and right parts of the pivot element
         size_t i = start;
@@ -222,17 +224,16 @@ namespace arrmath {
  
         while (i < pivotIndex && j > pivotIndex) {
  
-            while (arr[i] <= pivot) {
+            while (arr[i].first <= pivot) {
                 i++;
             }
  
-            while (arr[j] > pivot) {
+            while (arr[j].first > pivot) {
                 j--;
             }
  
             if (i < pivotIndex && j > pivotIndex) {
-                swap(arr[i++], arr[j--]);
-                swap(idx[i++], idx[j--]);
+                std::swap(arr[i++], arr[j--]);
             }
         }
  
@@ -240,20 +241,20 @@ namespace arrmath {
     }
     
     template<typename T>
-    void quickSort(vector<T> &arr, vector<mtxIndex> &idx, int start, int end)
+    void quickSort(vector<valIdx<T>> &arr,int start, int end)
     {
         // base case
         if (start >= end)
             return;
  
         // partitioning the array
-        int p = partition(arr, idx, start, end);
+        int p = partition(arr, start, end);
  
         // Sorting the left part
-        quickSort(arr, idx, start, p - 1);
+        quickSort(arr, start, p - 1);
  
         // Sorting the right part
-        quickSort(arr, idx, p + 1, end);
+        quickSort(arr, p + 1, end);
     }
 
     //=================//
@@ -663,23 +664,23 @@ namespace arrmath {
     template<typename T>
     vector<mtxIndex> matrixSortIndices(matrix<T> mtx){
         size_t length = mtx.size() * mtx[0].size();
-        vector<T> vec;
-        vector<mtxIndex> idx;
+        vector<valIdx<T>> vec;
         for (size_t i{}; i < mtx.size(); i++){
             for (size_t j{}; j < mtx[i].size(); j++) {
-                vec.push_back(mtx[i][j]);
-                idx.push_back({ i, j });
+                vec.push_back({ mtx[i][j], {i, j} });
             }
         }
-        quickSort(vec, idx, 0, length - 1);
-        return idx;
+        quickSort(vec, 0, (int)length - 1);
+        vector<mtxIndex> result;
+        for (size_t i{}; i<length; i++){
+            result.push_back({ vec[i].second.first, vec[i].second.second });
+        }
+        return result;
     }
 
     //==========================================//
     //  CONVERSION BETWEEN COORDINATE SYSTEMS   //
     //==========================================//
-    
-    
 
     // Convert polar coordinates to a cartesian vector
     template<typename T>
