@@ -38,6 +38,7 @@ namespace arrmath {
     // index pair for matrix sorting
     using mtxIndex = std::pair<size_t, size_t>;
 
+    // value, index i, index j
     template<typename T>
     using valIdx = std::pair<T,std::pair<size_t, size_t>>;
 
@@ -134,6 +135,10 @@ namespace arrmath {
     // get the minimum value in a matrix
     template<typename T>
     T matrixMin(matrix<T> mtx);
+
+    // get the minimum and maximum values in a matrix in one operation.
+    template<typename T>
+    std::pair<T,T> matrixMinMax(matrix<T> mtx);
 
     // Element-wise mutliplication of two matrices
     template<typename T>
@@ -506,7 +511,6 @@ namespace arrmath {
         return vec;
     }
 
-
     //=================//
     //  MATRIX MATHS   //
     //=================//
@@ -544,6 +548,20 @@ namespace arrmath {
             }
         }
         return min;
+    }
+
+    // get the minimum and maximum values in a matrix with one operation.
+    template<typename T>
+    std::pair<T,T> matrixMinMax(matrix<T> mtx) {
+        T min = mtx[0][0];
+        T max = mtx[0][0];
+        for (size_t i = 0; i < mtx.size(); i++) {
+            for (size_t j = 0; j < mtx[i].size(); j++) {
+                min = (mtx[i][j] < min) ? mtx[i][j] : min;
+                max = (mtx[i][j] > max) ? mtx[i][j] : max;
+            }
+        }
+        return std::pair<T,T>{ min, max };
     }
 
     // Element-wise mutliplication of two matrices
