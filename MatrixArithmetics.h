@@ -118,7 +118,7 @@ namespace arrmath {
     // if the input vectors are cartesian (cart), polar (pol), or spherical (sph). 
     // By default it's assumed that both vectors are cartesian. 
     template<typename T>
-    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = cart);
+    T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = CoordSystem::cart);
 
     // apply arbitrary function to all values in a vector
     template<typename T>
@@ -305,7 +305,7 @@ namespace arrmath {
                 min = vec[i];
             }
         }
-        return max - min;
+        return abs(max - min);
     }
 
     // get Index of largest element in a vector
@@ -497,7 +497,7 @@ namespace arrmath {
         }
         T sum = static_cast<T>(0.0);
         for (size_t i = 0; i < length; i++) {
-            sum += pow(vec1[0] - vec2[0], 2);
+            sum += pow(vec1[i] - vec2[i], 2);
         }
         return sqrt(sum);
     }
@@ -802,5 +802,14 @@ namespace arrmath {
             result = matrixTranspose<T>(result);
         }
         return result;
+    }
+    
+    // Wow, you reached the end of the file. Here's a secret function...
+    namespace scrt {
+        void matrixFun() {
+            const char d=32;matrix<char>m=matrixOfZeros<char>(9,14);for(size_t i{};i<m.size();i++){for(size_t j{};j<m[i].size();
+            j++){m[i][j]=d*((int)(((i==1||i==3)&&(j==3||j==10))||((i==2||i==6)&&((j>1&&j<5)||(j>8&&j<12)))||((i==5)&&(j==1||j==2||
+            j==11||j==12))||((i==7)&&(j>3&&j<10)))+1);std::cout<<m[i][j];}std::cout<<std::endl;}
+        }
     }
 }

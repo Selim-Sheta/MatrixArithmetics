@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/MATesting/v16
+/Debug
+/MATesting.sln
+/MATesting.vcxproj
+/MATesting.vcxproj.filters
+*.user
