@@ -56,6 +56,11 @@ namespace arrmath {
     template<typename T>
     T vectorMin(vector<T> vec);
 
+    // get the minimum and maximum values in a vector with one operation. 
+    // The result is a pair in the form {min, max}
+    template<typename T>
+    std::pair<T, T> vectorMinMax(vector<T> vec);
+
     // get the difference between the largest and smallest value in a vector
     template<typename T>
     T vectorSpan(vector<T> vec);
@@ -123,6 +128,11 @@ namespace arrmath {
     // apply arbitrary function to all values in a vector
     template<typename T>
     vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func);
+
+    // Outputs the indices of the vector, arranged in ascending order of the values in the vector.
+    // EG: [0, 100, 50, 25, 75] => [0, 3, 2, 4, 1]
+    template<typename T>
+    vector<size_t> vectorSortIndices(vector<T> vec);
 
     // create matrix of zeros
     template<typename T>
@@ -290,6 +300,19 @@ namespace arrmath {
             min = (vec[i] < min) ? vec[i] : min;
         }
         return min;
+    }
+
+    // get the minimum and maximum values in a vector with one operation. 
+    // The result is a pair in the form {min, max}
+    template<typename T>
+    std::pair<T,T> vectorMinMax(vector<T> vec) {
+        T min = vec[0];
+        T max = vec[0];
+        for (size_t i = 0; i < vec.size(); i++) {
+            min = (vec[i] < min) ? vec[i] : min;
+            max = (vec[i] > max) ? vec[i] : max;
+        }
+        return std::pair<T,T>{ min, max };
     }
 
     // get the difference between the largest and smallest value in a vector
@@ -509,6 +532,23 @@ namespace arrmath {
             vec[i] = func(vec[i]);
         }
         return vec;
+    }
+
+    // Sorts the vector, outputs the indices in order.
+    // EG: [0, 100, 50, 25, 75] => [0, 3, 2, 4, 1]
+    template<typename T>
+    vector<size_t> vectorSortIndices(vector<T> vec){
+        size_t length = vec.size();
+        vector<valIdx<T>> vec2;
+        for (size_t i{}; i < length; i++){
+            vec2.push_back({ vec[i], {i, 0} }); 
+        }
+        quickSort(vec2, 0, (int)length - 1);
+        vector<size_t> result;
+        for (size_t i{}; i<length; i++){
+            result.push_back({ vec2[i].second.first});
+        }
+        return result;
     }
 
     //=================//
