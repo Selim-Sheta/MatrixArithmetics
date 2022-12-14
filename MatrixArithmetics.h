@@ -5,16 +5,20 @@
     Created: 25 Nov 2022 5:02:28pm
     Author:  Selim Sheta
     
-    MatrixArithmetics is a header only micro-library containing useful basic functions 
+    MatrixArithmetics is a header only "micro-library" containing useful basic functions 
     for manipulating vectors and matrices. Functions starting with "vector" can only be applied to
     a vector, and functions starting with "matrix" can only be applied to a matrix. 
 
     The library is designed for maximum flexibility, prioritising no compile errors over
-    safety. For example, you can do a dot product between two vectors of different sizes. 
+    "mathematical safety". For example, you can do a dot product between two vectors of different sizes. 
     The result will obviously be wrong, but you won't get errors or warnings.
 
     Strongly recommended: "using namespace arrmath" at the top of your file.
-    Note: This library is not particularly fast, to be avoided for time-critical operations.
+    Notes: 
+    - This library is not particularly fast, to be avoided for time-critical operations.
+    - This library hasn't been fully tested as of 14/12/2022
+    - To be tested : matrix functions, coord system functions
+    - To be added : more functions, support for pass-by-reference for all functions
 
   ==============================================================================
 */
@@ -35,12 +39,8 @@ namespace arrmath {
     template<typename T>
     using vector = std::vector<T>;
 
-    // index pair for matrix sorting
+    // index pair for matrices
     using mtxIndex = std::pair<size_t, size_t>;
-
-    // value, index i, index j
-    template<typename T>
-    using valIdx = std::pair<T,std::pair<size_t, size_t>>;
 
     enum class CoordSystem { cart = 0, pol = 1, sph = 2 };
 
@@ -101,6 +101,10 @@ namespace arrmath {
     template<typename T>
     T vectorDotProduct(vector<T> vec1, vector<T> vec2);
 
+    // Compute the cross product of two vectors
+    template<typename T>
+    vector<T> vectorCrossProduct(vector<T> vec1, vector<T> vec2);
+
     // Compute the magnitude (Euclidean norm) of a vector
     template<typename T>
     T vectorMagnitude(vector<T> vec);
@@ -129,7 +133,7 @@ namespace arrmath {
     template<typename T>
     vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func);
 
-    // Outputs the indices of the vector, arranged in ascending order of the values in the vector.
+    // sort vector and return indices arranged in ascending order.
     // EG: [0, 100, 50, 25, 75] => [0, 3, 2, 4, 1]
     template<typename T>
     vector<size_t> vectorSortIndices(vector<T> vec);
@@ -189,6 +193,7 @@ namespace arrmath {
     // Convert polar vector to cartesian vector
     template<typename T>
     vector<T> polToCart(vector<T> vec);
+
     // Convert polar coordinates stored in separate vectors to cartesian vectors stored
     // in a matrix.
     template<typename T>
@@ -219,58 +224,66 @@ namespace arrmath {
 
     //////////// QUICKSORT UTILITIES ///////////
 
-    template<typename T>
-    int partition(vector<valIdx<T>> &arr, int start, int end)
-    {
-        T pivot = arr[start].first;
- 
-        int count = 0;
-        for (size_t i = start + 1; i <= end; i++) {
-            if (arr[i].first <= pivot) count++;
+    namespace utils {
+
+        // value, index i, index j
+        template<typename T>
+        using valIdx = std::pair<T, std::pair<size_t, size_t>>;
+
+        template<typename T>
+        int partition(vector<valIdx<T>>& arr, int start, int end)
+        {
+            T pivot = arr[start].first;
+
+            int count = 0;
+            for (int i = start + 1; i <= end; i++) {
+                if (arr[i].first <= pivot) count++;
+            }
+
+            // Giving pivot element its correct position
+            int pivotIndex = start + count;
+            std::swap(arr[pivotIndex], arr[start]);
+
+            // Sorting left and right parts of the pivot element
+            int i = start;
+            int j = end;
+
+            while (i < pivotIndex && j > pivotIndex) {
+
+                while (arr[i].first <= pivot) {
+                    i++;
+                }
+
+                while (arr[j].first > pivot) {
+                    j--;
+                }
+
+                if (i < pivotIndex && j > pivotIndex) {
+                    std::swap(arr[i++], arr[j--]);
+                }
+            }
+
+            return pivotIndex;
         }
- 
-        // Giving pivot element its correct position
-        int pivotIndex = start + count;
-        std::swap(arr[pivotIndex], arr[start]);
- 
-        // Sorting left and right parts of the pivot element
-        size_t i = start;
-        size_t j = end;
- 
-        while (i < pivotIndex && j > pivotIndex) {
- 
-            while (arr[i].first <= pivot) {
-                i++;
-            }
- 
-            while (arr[j].first > pivot) {
-                j--;
-            }
- 
-            if (i < pivotIndex && j > pivotIndex) {
-                std::swap(arr[i++], arr[j--]);
-            }
+
+        template<typename T>
+        void quickSort(vector<valIdx<T>>& arr, int start, int end)
+        {
+            // base case
+            if (start >= end)
+                return;
+
+            // partitioning the array
+            int p = partition(arr, start, end);
+
+            // Sorting the left part
+            quickSort(arr, start, p - 1);
+
+            // Sorting the right part
+            quickSort(arr, p + 1, end);
         }
- 
-        return pivotIndex;
     }
-    
-    template<typename T>
-    void quickSort(vector<valIdx<T>> &arr,int start, int end)
-    {
-        // base case
-        if (start >= end)
-            return;
- 
-        // partitioning the array
-        int p = partition(arr, start, end);
- 
-        // Sorting the left part
-        quickSort(arr, start, p - 1);
- 
-        // Sorting the right part
-        quickSort(arr, p + 1, end);
-    }
+   
 
     //=================//
     //  VECTOR MATHS   //
@@ -459,6 +472,22 @@ namespace arrmath {
         return result;
     }
 
+    // Compute the cross product of two vectors
+    template<typename T>
+    vector<T> vectorCrossProduct(vector<T> vec1, vector<T> vec2) {
+        if ((vec1.size() != vec2.size() || vec1.size() != 3) && !DISABLE_WARNINGS) {
+            std::cout << "vectorCrossProduct | Warning : dimensions don't match. Both vectors must have 3 values." << std::endl;
+        }
+        while (vec1.size() < 3) {
+            vec1.push_back(static_cast<T>(0.0));
+        }
+        while (vec2.size() < 3) {
+            vec2.push_back(static_cast<T>(0.0));
+        }
+        
+        return vector<T>{vec1[1]*vec2[2] - vec1[2] * vec2[1], vec1[2] * vec2[0] - vec1[0] * vec2[2], vec1[0] * vec2[1] - vec1[1] * vec2[0]};
+    }
+
     // Compute the magnitude (Euclidean norm) of a vector
     template<typename T>
     T vectorMagnitude(vector<T> vec) {
@@ -539,11 +568,11 @@ namespace arrmath {
     template<typename T>
     vector<size_t> vectorSortIndices(vector<T> vec){
         size_t length = vec.size();
-        vector<valIdx<T>> vec2;
+        vector<utils::valIdx<T>> vec2;
         for (size_t i{}; i < length; i++){
             vec2.push_back({ vec[i], {i, 0} }); 
         }
-        quickSort(vec2, 0, (int)length - 1);
+        utils::quickSort(vec2, 0, (int)length - 1);
         vector<size_t> result;
         for (size_t i{}; i<length; i++){
             result.push_back({ vec2[i].second.first});
@@ -722,13 +751,13 @@ namespace arrmath {
     template<typename T>
     vector<mtxIndex> matrixSortIndices(matrix<T> mtx){
         size_t length = mtx.size() * mtx[0].size();
-        vector<valIdx<T>> vec;
+        vector<utils::valIdx<T>> vec;
         for (size_t i{}; i < mtx.size(); i++){
             for (size_t j{}; j < mtx[i].size(); j++) {
                 vec.push_back({ mtx[i][j], {i, j} });
             }
         }
-        quickSort(vec, 0, (int)length - 1);
+        utils::quickSort(vec, 0, (int)length - 1);
         vector<mtxIndex> result;
         for (size_t i{}; i<length; i++){
             result.push_back({ vec[i].second.first, vec[i].second.second });
@@ -773,7 +802,7 @@ namespace arrmath {
         return result;
     }
 
-    // Convert polar vectors stored in a matrix to cartesian vectors stored
+    // Convert polar vectors stored in a matrix, to cartesian vectors stored
     // in a matrix.
     template<typename T>
     matrix<T> polToCart(matrix<T> mtx, bool transpose) {
@@ -810,7 +839,7 @@ namespace arrmath {
         return result;
     }
 
-    // Convert spherical coordinates stored in separate vectors to cartesian vectors stored
+    // Convert spherical coordinates stored in separate vectors, to cartesian vectors stored
     // in a matrix.
     template<typename T>
     matrix<T> sphToCart(vector<T> theta, vector<T> phi, vector<T> radius, bool transpose) {

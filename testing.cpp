@@ -72,7 +72,15 @@ int main(){
 	vector<double> test20 = vectorFunc<double>(test1, [](double x){return 2 * x - 1; });
 	printResult("vectorFunc", test20 == vector<double>{-1.0, -1.0, -1.0, 19.0, -1.0, -1.0, 19.0, -1.0, -1.0, -21.0 });
 
+	std::pair<double, double> test21 = vectorMinMax(vector<double>{-3.0, -2.0, -1.0, 0.0, -1.0, 2.0});
+	printResult("vectorMinMax", test21.first = -3.0 && test21.second == 2.0);
 
+	vector<size_t> test22 = vectorSortIndices(vector<double>{0.0, 100.0, 50.0, 25.0, 75.0});
+	printResult("vectorSortIndices", test22 == vector<size_t>{ 0, 3, 2, 4, 1 });
+
+	vector<double> test23 = vectorCrossProduct(vector<double>{2.0, 3.0, 4.0}, vector<double>{5.0, 6.0, 7.0});
+	printResult("vectorCrossProduct", test23 == vector<double>{ -3.0, 6.0, -3.0 });
+	
 	scrt::matrixFun();
 
 	return 0;
