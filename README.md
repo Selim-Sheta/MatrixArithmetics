@@ -68,6 +68,7 @@ To be added soon:
 - matrixInvert
 - matrixFlip
 - matrixIdentity
+- matrixDeterm
 - cartToPol
 - cartToSph
 - polToSph
