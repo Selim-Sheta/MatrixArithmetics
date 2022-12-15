@@ -27,6 +27,7 @@ Notes:
 - vectorScale : scale by a constant
 - vectorTranspose : convert to column vector
 - vectorDotProduct : compute dot product
+- vectorCrossProduct : compute cross product between two 3D vectors
 - vectorMagnitude : compute Euclidean norm (magnitude)
 - vectorNormalise : divide all values in the vector by its magnitude
 - vectorAverage : compute average of two or more points in space
@@ -54,7 +55,6 @@ Notes:
 
 To be added soon:
 - vectorQuickSort
-- vectorCrossProduct
 - vectorAvg
 - vectorShiftToZero
 - vectorAngleBetween
