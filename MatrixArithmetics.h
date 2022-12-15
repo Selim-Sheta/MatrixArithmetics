@@ -56,6 +56,11 @@ namespace arrmath {
     template<typename T>
     T vectorMin(vector<T> vec);
 
+    // get the minimum and maximum values in a vector with one operation. 
+    // The result is a pair in the form {min, max}
+    template<typename T>
+    std::pair<T, T> vectorMinMax(vector<T> vec);
+
     // get the difference between the largest and smallest value in a vector
     template<typename T>
     T vectorSpan(vector<T> vec);
@@ -310,6 +315,19 @@ namespace arrmath {
         return min;
     }
 
+    // get the minimum and maximum values in a vector with one operation. 
+    // The result is a pair in the form {min, max}
+    template<typename T>
+    std::pair<T,T> vectorMinMax(vector<T> vec) {
+        T min = vec[0];
+        T max = vec[0];
+        for (size_t i = 0; i < vec.size(); i++) {
+            min = (vec[i] < min) ? vec[i] : min;
+            max = (vec[i] > max) ? vec[i] : max;
+        }
+        return std::pair<T,T>{ min, max };
+    }
+
     // get the difference between the largest and smallest value in a vector
     template<typename T>
     T vectorSpan(vector<T> vec) {
@@ -531,7 +549,7 @@ namespace arrmath {
         }
         T sum = static_cast<T>(0.0);
         for (size_t i = 0; i < length; i++) {
-            sum += pow(vec1[0] - vec2[0], 2);
+            sum += pow(vec1[i] - vec2[i], 2);
         }
         return sqrt(sum);
     }
