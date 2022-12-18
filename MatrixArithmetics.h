@@ -113,12 +113,16 @@ namespace arrmath {
     template<typename T>
     vector<T> vectorNormalise(vector<T> vec);
 
-    // Compute the average of two vectors
+    // Compute the mean of all values in a vector
+    template<typename T>
+    vector<T> vectorAverage(vector<T> vec);
+
+    // Compute the average of two points
     template<typename T>
     vector<T> vectorAverage(vector<T> vec1, vector<T> vec2);
 
-    // Compute the average of multiple vectors stored in a matrix.
-    // All vectors must be of the same length. The vectors must be
+    // Compute the average of multiple points stored in a matrix.
+    // All points must have the same number of coordinates. The points must be
     // rows in the matrix.
     template<typename T>
     vector<T> vectorAverage(matrix<T> mtx);
@@ -129,11 +133,16 @@ namespace arrmath {
     template<typename T>
     T vectorGetDistance(vector<T> vec1, vector<T> vec2, CoordSystem coordinateSystem = CoordSystem::cart);
 
-    // apply arbitrary function to all values in a vector
+    // Apply arbitrary function to all values in a vector
     template<typename T>
     vector<T> vectorFunc(vector<T> vec, std::function<T(T)> func);
 
-    // sort vector and return indices arranged in ascending order.
+    // Applies quick sort to the vector and returns the sorted version in ascending order. 
+    // EG: [0, 100, 50, 25, 75] => [0, 25, 50, 75, 100]
+    template<typename T>
+    vector<size_t> vectorQuickSort(vector<T> vec);
+
+    // Sorts vector & outputs the indices in order.
     // EG: [0, 100, 50, 25, 75] => [0, 3, 2, 4, 1]
     template<typename T>
     vector<size_t> vectorSortIndices(vector<T> vec);
@@ -174,6 +183,10 @@ namespace arrmath {
     template<typename T>
     matrix<T> matrixTranspose(matrix<T> mtx);
 
+    // Compute the average of all values in a matrix
+    template<typename T>
+    T matrixAverage(matrix<T> mtx);
+
     // apply arbitrary function to all values in a matrix
     template<typename T>
     matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func);
@@ -182,7 +195,11 @@ namespace arrmath {
     template<typename T>
     matrix<T> matrixShiftToZero(matrix<T> mtx);
 
-    // Flatten and sort a matrix, output the indices in order.
+    // Apply quick sort to a matrix.
+    template<typename T>
+    matrix<T> matrixQuickSort(matrix<T> mtx);
+
+    // Sorts matrix & outputs the indices in order.
     template<typename T>
     vector<mtxIndex> matrixSortIndices(matrix<T> mtx);
 
@@ -506,7 +523,22 @@ namespace arrmath {
         else return vec;
     }
 
-    // Compute the average of two vectors
+    // Compute the mean of all values in a vector
+    template<typename T>
+    T vectorAverage(vector<T> vec) {
+        T result = static_cast<T>(0.0);
+        size_t numOfValues = 0;
+        for (size_t i = 0; i < vec.size(); i++) {
+            result += vec[i];
+            numOfValues++;
+        }
+        if (numOfValues == 0) {
+            return static_cast<T>(0.0);
+        }
+        return result / static_cast<T>(numOfValues);
+    }
+
+    // Compute the average of two points
     template<typename T>
     vector<T> vectorAverage(vector<T> vec1, vector<T> vec2) {
         for (size_t i = 0; i < vec1.size(); i++) {
@@ -515,8 +547,8 @@ namespace arrmath {
         return vectorScale<T>(vec1, static_cast<T>(0.5));
     }
 
-    // Compute the average of multiple vectors stored in a matrix.
-    // All vectors must be of the same length. The vectors must be
+    // Compute the average of multiple points stored in a matrix.
+    // All points must have the same number of coordinates. The points must be
     // rows in the matrix.
     template<typename T>
     vector<T> vectorAverage(matrix<T> mtx) {
@@ -563,6 +595,23 @@ namespace arrmath {
         return vec;
     }
 
+    // Applies quick sort to the vector and returns the sorted version in ascending order. 
+    // EG: [0, 100, 50, 25, 75] => [0, 25, 50, 75, 100]
+    template<typename T>
+    vector<T> vectorQuickSort(vector<T> vec) {
+        size_t length = vec.size();
+        vector<utils::valIdx<T>> vec2;
+        for (size_t i{}; i < length; i++) {
+            vec2.push_back({ vec[i], {i, 0} });
+        }
+        utils::quickSort(vec2, 0, (int)length - 1);
+        vector<T> result;
+        for (size_t i{}; i < length; i++) {
+            result.push_back(vec2[i].first);
+        }
+        return result;
+    }
+
     // Sorts the vector, outputs the indices in order.
     // EG: [0, 100, 50, 25, 75] => [0, 3, 2, 4, 1]
     template<typename T>
@@ -575,7 +624,7 @@ namespace arrmath {
         utils::quickSort(vec2, 0, (int)length - 1);
         vector<size_t> result;
         for (size_t i{}; i<length; i++){
-            result.push_back({ vec2[i].second.first});
+            result.push_back(vec2[i].second.first);
         }
         return result;
     }
@@ -722,6 +771,23 @@ namespace arrmath {
         return result;
     }
 
+    // Compute the average of all values in a matrix
+    template<typename T>
+    T matrixAverage(matrix<T> mtx) {
+        T result = static_cast<T>(0.0);
+        size_t numOfValues = 0;
+        for (size_t i = 0; i < mtx.size(); i++) {
+            for (size_t j = 0; j < mtx[j].size(); j++) {
+                result += mtx[i][j];
+                numOfValues++;
+            }
+        }
+        if (numOfValues == 0) {
+            return static_cast<T>(0.0);
+        }
+        return result / static_cast<T>(numOfValues);
+    }
+
     // apply arbitrary function to all values in a matrix
     template<typename T>
     matrix<T> matrixFunc(matrix<T> mtx, std::function<T(T)> func) {
@@ -747,7 +813,30 @@ namespace arrmath {
         return mtx;
     }
 
-    // Flatten and sort a matrix, output the indices in order.
+    // Apply quick sort to a matrix.
+    template<typename T>
+    matrix<T> matrixQuickSort(matrix<T> mtx) {
+        size_t numRows = mtx.size();
+        size_t numCols = mtx[0].size();
+        size_t length = numRows * numCols;
+        vector<utils::valIdx<T>> vec;
+        for (size_t i{}; i < mtx.size(); i++) {
+            for (size_t j{}; j < mtx[i].size(); j++) {
+                vec.push_back({ mtx[i][j], {i, j} });
+            }
+        }
+        utils::quickSort(vec, 0, (int)length - 1);
+        matrix<T> result;
+        size_t idx = 0;
+        for (size_t i{}; i < length; i++) {
+            for (size_t j{}; j < mtx[i].size(); j++) {
+                result[i][j] = vec[idx++].first;
+            }
+        }
+        return result;
+    }
+
+    // Sort a matrix, output the indices in order.
     template<typename T>
     vector<mtxIndex> matrixSortIndices(matrix<T> mtx){
         size_t length = mtx.size() * mtx[0].size();
