@@ -115,7 +115,7 @@ namespace arrmath {
 
     // Compute the mean of all values in a vector
     template<typename T>
-    vector<T> vectorAverage(vector<T> vec);
+    T vectorAverage(vector<T> vec);
 
     // Compute the average of two points
     template<typename T>
