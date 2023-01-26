@@ -183,6 +183,10 @@ namespace arrmath {
     template<typename T>
     matrix<T> matrixTranspose(matrix<T> mtx);
 
+    // Remap all values to fit in the desired range, by default [0,1]
+    template<typename T>
+    matrix<T> matrixRemap(matrix<T> mtx, T min = 0.0, T max = 1.0);
+
     // Compute the average of all values in a matrix
     template<typename T>
     T matrixAverage(matrix<T> mtx);
@@ -771,6 +775,18 @@ namespace arrmath {
         return result;
     }
 
+    // Linear mapping of all values to fit in the desired range, by default [0,1]
+    template<typename T>
+    matrix<T> matrixRemap(matrix<T> mtx, T min, T max){
+        std::pair<T,T> minMax = matrixMinMax<T>(mtx);
+        if ((minMax.second - minMax.first) != static_cast<T>(0.0)){
+            T m = (max - min) / (minMax.second - minMax.first);
+            T b = min - minMax.first * m;
+            return matrixFunc<T>(mtx, [m,b](T x) { return m*x+b; });
+        }
+        return matrixFunc<T>(mtx, [](T x) { return static_cast<T>(0.0); });
+    }
+
     // Compute the average of all values in a matrix
     template<typename T>
     T matrixAverage(matrix<T> mtx) {
@@ -963,11 +979,11 @@ namespace arrmath {
     }
 
     // Wow, you reached the end of the file. Here's a secret function...
-    namespace scrt {
+    /*namespace scrt {
         void matrixFun() {
-           const char d=32;matrix<char>m=matrixOfZeros<char>(9,14);for(size_t i{};i<m.size();i++){for(size_t j{};j<m[i].size();
+           const char d=32;matrix<char>m=arrmath::matrixOfZeros<char>(9,14);for(size_t i{};i<m.size();i++){for(size_t j{};j<m[i].size();
             j++){m[i][j]=d*((int)(((i==1||i==3)&&(j==3||j==10))||((i==2||i==6)&&((j>1&&j<5)||(j>8&&j<12)))||((i==5)&&(j==1||j==2||
             j==11||j==12))||((i==7)&&(j>3&&j<10)))+1);std::cout<<m[i][j];}std::cout<<std::endl;}
         }
-    }
+    }*/
 }
