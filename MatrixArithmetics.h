@@ -13,7 +13,6 @@
     "mathematical safety". For example, you can do a dot product between two vectors of different sizes. 
     The result will obviously be wrong, but you won't get errors or warnings.
 
-    Strongly recommended: "using namespace arrmath" at the top of your file.
     Notes: 
     - This library is not particularly fast, to be avoided for time-critical operations.
     - This library hasn't been fully tested as of 14/12/2022
