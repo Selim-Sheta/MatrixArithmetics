@@ -100,6 +100,10 @@ namespace arrmath {
     template<typename T>
     T vectorDotProduct(vector<T> vec1, vector<T> vec2);
 
+    // Compute the angle between two vectors in radians
+    template<typename T>
+    T vectorAngle(const vector<T>& vec1, const vector<T>& vec2);
+
     // Compute the cross product of two vectors
     template<typename T>
     vector<T> vectorCrossProduct(vector<T> vec1, vector<T> vec2);
@@ -492,6 +496,13 @@ namespace arrmath {
         return result;
     }
 
+    // Compute the angle between two vectors in radians
+    template<typename T>
+    T vectorAngle(vector<T> vec1, vector<T> vec2) {
+        T dotProd = vectorDotProduct(vectorNormalise(vec1), vectorNormalise(vec2));
+        return acos(dotProd);
+    }
+
     // Compute the cross product of two vectors
     template<typename T>
     vector<T> vectorCrossProduct(vector<T> vec1, vector<T> vec2) {
@@ -584,7 +595,7 @@ namespace arrmath {
         }
         T sum = static_cast<T>(0.0);
         for (size_t i = 0; i < length; i++) {
-            sum += pow(vec1[i] - vec2[i], 2);
+            sum += pow(vec1[i] - vec2[i], T(2));
         }
         return sqrt(sum);
     }
