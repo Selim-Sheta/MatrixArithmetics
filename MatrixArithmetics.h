@@ -100,6 +100,10 @@ namespace arrmath {
     template<typename T>
     T vectorDotProduct(vector<T> vec1, vector<T> vec2);
 
+    // Compute the cosine of the angle between two vectors
+    template<typename T>
+    T vectorCosAngle(vector<T> vec1, vector<T> vec2);
+
     // Compute the angle between two vectors in radians
     template<typename T>
     T vectorAngle(const vector<T>& vec1, const vector<T>& vec2);
@@ -496,11 +500,18 @@ namespace arrmath {
         return result;
     }
 
+    // Compute the cosine of the angle between two vectors
+    template<typename T>
+    T vectorCosAngle(const vector<T>& vec1, const vector<T>& vec2) {
+        T dotProd = arrmath::vectorDotProduct(vectorNormalise(vec1), vectorNormalise(vec2));
+        return dotProd;
+
+    }
+
     // Compute the angle between two vectors in radians
     template<typename T>
-    T vectorAngle(vector<T> vec1, vector<T> vec2) {
-        T dotProd = vectorDotProduct(vectorNormalise(vec1), vectorNormalise(vec2));
-        return acos(dotProd);
+    T vectorAngle(const vector<T>& vec1, const vector<T>& vec2) {
+        return acos(arrmath::vectorCosAngle(vec1, vec2));
     }
 
     // Compute the cross product of two vectors
