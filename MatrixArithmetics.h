@@ -102,7 +102,7 @@ namespace arrmath {
 
     // Compute the cosine of the angle between two vectors
     template<typename T>
-    T vectorCosAngle(vector<T> vec1, vector<T> vec2);
+    T vectorCosAngle(const vector<T>& vec1, const vector<T>& vec2);
 
     // Compute the angle between two vectors in radians
     template<typename T>
@@ -503,7 +503,7 @@ namespace arrmath {
     // Compute the cosine of the angle between two vectors
     template<typename T>
     T vectorCosAngle(const vector<T>& vec1, const vector<T>& vec2) {
-        T dotProd = arrmath::vectorDotProduct(vectorNormalise(vec1), vectorNormalise(vec2));
+        T dotProd = arrmath::vectorDotProduct(arrmath::vectorNormalise(vec1), arrmath::vectorNormalise(vec2));
         return dotProd;
 
     }
